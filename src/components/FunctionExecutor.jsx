@@ -1,51 +1,49 @@
-
-
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
-// import './Accordion.css'; // optional: place custom styles here
 
 export default function FunctionExecutor({ contractAddress, abi, providerUrl }) {
   const provider = new ethers.JsonRpcProvider(providerUrl);
-  const [walletProvider, setWalletProvider] = useState(null);
-const [walletAddress, setWalletAddress] = useState(null);
-  const contract = new ethers.Contract(contractAddress, abi, provider);
+  const [walletAddress, setWalletAddress] = useState(null);
+  const [signer, setSigner] = useState(null);
   const functions = abi.filter(f => f.type === 'function');
-
+  
   const connectWallet = async () => {
-    const eth = window.ethereum;
-    if (!eth) return alert('MetaMask required');
-    await eth.request({ method: 'eth_requestAccounts' });
-    const signer = new ethers.BrowserProvider(eth).getSigner();
-    setWalletProvider(signer);
-    const addr= await (await signer).address;
-    const truncatedAddr = addr.slice(0, 6) + '...' + addr.slice(-4);
-    setWalletAddress(truncatedAddr);
+    try {
+      const eth = window.ethereum;
+      if (!eth) return alert('MetaMask required');
+      
+    //   const accounts = await eth.request({ method: 'eth_requestAccounts' });
+      const browserProvider = new ethers.BrowserProvider(eth);
+      const signer = await browserProvider.getSigner();
+      
+      setSigner(signer);
+      const addr = await signer.getAddress();
+      const truncatedAddr = addr.slice(0, 6) + '...' + addr.slice(-4);
+      setWalletAddress(truncatedAddr);
+    } catch (err) {
+      console.error('Wallet connection error:', err);
+      alert('Failed to connect wallet');
+    }
   };
-// console.log(walletAddress);
+
   return (
     <div>
-        {
-          !walletAddress && (
-            <button onClick={connectWallet} className="bg-blue-600 text-white px-3 py-1 rounded">
-              {walletAddress ? walletAddress : 'Connect Wallet'}
-            </button>
-          )
-        }
-        {
-          walletAddress && (
-            <button onClick={connectWallet} className="bg-blue-600 text-white px-3 py-1 rounded">
-              {walletAddress ? 'Connected: ' + walletAddress : 'Connect Wallet'}
-            </button>
-          )
-        }
+      <button 
+        onClick={connectWallet} 
+        className="bg-blue-600 text-white px-3 py-1 rounded"
+      >
+        {walletAddress ? 'Connected: ' + walletAddress : 'Connect Wallet'}
+      </button>
       
       <div className="accordion">
         {functions.map((fn, idx) => (
           <AccordionItem
             key={idx}
             fn={fn}
-            contract={contract}
-            signer={walletProvider}
+            contractAddress={contractAddress}
+            abi={abi}
+            provider={provider}
+            signer={signer}
           />
         ))}
       </div>
@@ -53,7 +51,7 @@ const [walletAddress, setWalletAddress] = useState(null);
   );
 }
 
-function AccordionItem({ fn, contract, signer }) {
+function AccordionItem({ fn, contractAddress, abi, provider, signer }) {
   const [open, setOpen] = useState(false);
   const [inputs, setInputs] = useState({});
   const [result, setResult] = useState(null);
@@ -65,19 +63,26 @@ function AccordionItem({ fn, contract, signer }) {
   const execute = async () => {
     try {
       const args = fn.inputs.map((_, i) => inputs[i]);
-      const method = contract[fn.name];
-  
+      
       if (fn.stateMutability === 'view' || fn.stateMutability === 'pure') {
-        const res = await method(...args);
-        setResult(cleanBigInts(res)); // 👈 Fix applied here
+        // For read-only functions, use the provider
+        const contract = new ethers.Contract(contractAddress, abi, provider);
+        const res = await contract[fn.name](...args);
+        setResult(cleanBigInts(res));
       } else {
+        // For write functions, use the signer
         if (!signer) return alert('Wallet not connected');
-        const contractWithSigner = contract.connect(signer);
+        const contractWithSigner = new ethers.Contract(contractAddress, abi, signer);
         const tx = await contractWithSigner[fn.name](...args);
-        setResult({ txHash: tx.hash });
+        await tx.wait(); // Wait for transaction to be mined
+        setResult({ 
+          txHash: tx.hash,
+          message: 'Transaction successful!'
+        });
       }
     } catch (err) {
-      setResult({ error: err.message });
+      console.error('Execution error:', err);
+      setResult({ error: err.message || 'Transaction failed' });
     }
   };
   
