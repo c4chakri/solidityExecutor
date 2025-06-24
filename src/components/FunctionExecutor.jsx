@@ -6,7 +6,7 @@ export default function FunctionExecutor({ contractAddress, abi, providerUrl }) 
   const [walletAddress, setWalletAddress] = useState(null);
   const [signer, setSigner] = useState(null);
   const functions = abi.filter(f => f.type === 'function');
-  
+  const [network, setNetwork] = useState('');
   const connectWallet = async () => {
     try {
       const eth = window.ethereum;
@@ -15,6 +15,8 @@ export default function FunctionExecutor({ contractAddress, abi, providerUrl }) 
     //   const accounts = await eth.request({ method: 'eth_requestAccounts' });
       const browserProvider = new ethers.BrowserProvider(eth);
       const signer = await browserProvider.getSigner();
+    //   console.log("browserProvider",(await browserProvider.getNetwork()).name);
+      setNetwork((await browserProvider.getNetwork()).name);
       
       setSigner(signer);
       const addr = await signer.getAddress();
@@ -32,7 +34,7 @@ export default function FunctionExecutor({ contractAddress, abi, providerUrl }) 
         onClick={connectWallet} 
         className="bg-blue-600 text-white px-3 py-1 rounded"
       >
-        {walletAddress ? 'Connected: ' + walletAddress : 'Connect Wallet'}
+        {walletAddress ? network + ' : ' + walletAddress : 'Connect Wallet'}
       </button>
       
       <div className="accordion">
