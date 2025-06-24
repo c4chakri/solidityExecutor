@@ -1,0 +1,130 @@
+:root {
+  --bg-color: #121212;
+  --surface-color: #1e1e1e;
+  --text-color: #e0e0e0;
+  --border-color: #2c2c2c;
+  --primary-color: #4f46e5;
+  --primary-hover: #3730a3;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  padding: 8rem;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  background: var(--surface-color);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+}
+
+input,
+textarea,
+select,
+button {
+  font-size: 1rem;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: #2a2a2a;
+  color: var(--text-color);
+  box-sizing: border-box;
+}
+
+button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--primary-hover);
+}
+
+textarea {
+  resize: vertical;
+}
+
+.function-block {
+  border: 1px solid var(--border-color);
+  background-color: #1a1a1a;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+h1, h3 {
+  color: #ffffff;
+}
+
+.accordion-item {
+  background-color: #1a1a1a;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  overflow: hidden;
+}
+
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 20px;
+  cursor: pointer;
+  background: #2a2a2a;
+  font-weight: 500;
+  font-size: 1rem;
+  border-bottom: 1px solid #333;
+}
+
+.accordion-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #1a1a1a;
+}
+
+.result-box {
+  background: #111;
+  color: #ddd;
+  padding: 12px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.json-btn {
+  background-color: #444;
+  color: #ccc;
+  border: none;
+  width: fit-content;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.json-btn:hover {
+  background-color: #555;
+}
+
+.exec-btn {
+  background-color: #4f46e5;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
