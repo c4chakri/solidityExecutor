@@ -4,6 +4,7 @@ const networks = {
   mainnet: 'https://mainnet.infura.io/v3/YOUR_INFURA_ID',
   sepolia: 'https://sepolia.infura.io/v3/e427baed8ae44e6ba79e542b53c0a524',
   polygon: 'https://polygon-rpc.com',
+  holesky: 'https://ethereum-holesky-rpc.publicnode.com',
 };
 
 export default function ContractForm({ onLoad, saved }) {
