@@ -1,42 +1,12 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
 
-export default function FunctionExecutor({ contractAddress, abi, providerUrl }) {
-  const provider = new ethers.JsonRpcProvider(providerUrl);
-  const [walletAddress, setWalletAddress] = useState(null);
-  const [signer, setSigner] = useState(null);
+export default function FunctionExecutor({ contractAddress, abi, providerUrl, signer }) {
+  const provider = providerUrl ? new ethers.JsonRpcProvider(providerUrl) : null;
   const functions = abi.filter(f => f.type === 'function');
-  const [network, setNetwork] = useState('');
-  const connectWallet = async () => {
-    try {
-      const eth = window.ethereum;
-      if (!eth) return alert('MetaMask required');
-      
-    //   const accounts = await eth.request({ method: 'eth_requestAccounts' });
-      const browserProvider = new ethers.BrowserProvider(eth);
-      const signer = await browserProvider.getSigner();
-    //   console.log("browserProvider",(await browserProvider.getNetwork()).name);
-      setNetwork((await browserProvider.getNetwork()).name);
-      
-      setSigner(signer);
-      const addr = await signer.getAddress();
-      const truncatedAddr = addr.slice(0, 6) + '...' + addr.slice(-4);
-      setWalletAddress(truncatedAddr);
-    } catch (err) {
-      console.error('Wallet connection error:', err);
-      alert('Failed to connect wallet');
-    }
-  };
 
   return (
     <div>
-      <button 
-        onClick={connectWallet} 
-        className="bg-blue-600 text-white px-3 py-1 rounded"
-      >
-        {walletAddress ? network + ' : ' + walletAddress : 'Connect Wallet'}
-      </button>
-      
       <div className="accordion">
         {functions.map((fn, idx) => (
           <AccordionItem
