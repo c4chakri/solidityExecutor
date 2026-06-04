@@ -66,7 +66,11 @@ export default function VerifyTx({ providerUrl, networkName }) {
         network: `${net.name} (chainId ${net.chainId.toString()})`,
         blockNumber: tx.blockNumber,
         timestamp: timestamp
-          ? new Date(timestamp * 1000).toUTCString()
+          ? new Date(timestamp * 1000).toLocaleString('en-IN', {
+              timeZone: 'Asia/Kolkata',
+              dateStyle: 'medium',
+              timeStyle: 'medium',
+            }) + ' IST'
           : 'Pending',
         confirmations:
           tx.blockNumber != null
