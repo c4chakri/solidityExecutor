@@ -2,19 +2,22 @@ import React, { useEffect, useState } from 'react';
 import ContractForm from './components/ContractForm';
 import FunctionExecutor from './components/FunctionExecutor';
 import VerifyTx from './components/VerifyTx';
-import WalletConnect, { NETWORKS } from './components/WalletConnect';
+import WalletConnect from './components/WalletConnect';
+import ThemeToggle from './components/ThemeToggle';
+import { useNetworks } from './lib/useNetworks';
+import { useTheme } from './lib/useTheme';
 
 export default function App() {
   const [contractData, setContractData] = useState(null);
   const [view, setView] = useState('contract');
   const [signer, setSigner] = useState(null);
   const [chainId, setChainId] = useState(null);
-  const [customNetworks, setCustomNetworks] = useState({});
+  const { networks, rpcUrlFor, addRpc, touch } = useNetworks();
+  const { theme, selectTheme } = useTheme();
 
-  // RPC URL derived from the network selected in the navbar wallet
-  const allNetworks = { ...NETWORKS, ...customNetworks };
-  const providerUrl = chainId ? allNetworks[chainId]?.rpcUrls?.[0] : null;
-  const networkName = chainId ? allNetworks[chainId]?.chainName : null;
+  // RPC URL derived from the network + endpoint selected in the navbar wallet
+  const providerUrl = rpcUrlFor(chainId);
+  const networkName = chainId ? networks[chainId]?.chainName : null;
 
   // Load from localStorage on initial load
   useEffect(() => {
@@ -49,27 +52,30 @@ export default function App() {
           </button>
         </div>
 
-        <div className="nav-wallet">
-          <WalletConnect
-            signer={signer}
-            setSigner={setSigner}
-            chainId={chainId}
-            setChainId={setChainId}
-            customNetworks={customNetworks}
-            setCustomNetworks={setCustomNetworks}
-          />
+        <div className="nav-right">
+          <ThemeToggle theme={theme} selectTheme={selectTheme} />
+          <div className="nav-wallet">
+            <WalletConnect
+              signer={signer}
+              setSigner={setSigner}
+              chainId={chainId}
+              setChainId={setChainId}
+              networks={networks}
+              addRpc={addRpc}
+              touch={touch}
+            />
+          </div>
         </div>
       </nav>
 
-      {!providerUrl && (
-        <p className="network-hint">
-          Connect your wallet and select a network from the top-right menu to continue.
-        </p>
-      )}
-
       {view === 'contract' && (
         <>
-          <ContractForm onLoad={handleLoad} saved={contractData} />
+          <ContractForm
+            onLoad={handleLoad}
+            saved={contractData}
+            providerUrl={providerUrl}
+            networkName={networkName}
+          />
           {contractData && (
             <FunctionExecutor
               {...contractData}
@@ -82,7 +88,7 @@ export default function App() {
             <button onClick={() => {
               localStorage.removeItem('contractData');
               setContractData(null);
-            }} className="bg-red-600 text-white px-3 py-1 rounded">
+            }} className="danger-btn">
               Clear Contract
             </button>
           )}

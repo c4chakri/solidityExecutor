@@ -98,15 +98,12 @@ export default function VerifyTx({ providerUrl, networkName }) {
     }
   };
 
-  const statusColor =
-    details?.status === 'Success'
-      ? '#22c55e'
-      : details?.status === 'Failed'
-      ? '#ef4444'
-      : '#eab308';
+  // Status colour comes from the theme tokens, so it holds in both themes.
+  const statusTone =
+    details?.status === 'Success' ? 'ok' : details?.status === 'Failed' ? 'fail' : 'pending';
 
   return (
-    <div className="space-y-4">
+    <div className="verify-form">
       <h3>Verify Transaction</h3>
 
       <p className="network-hint">
@@ -114,30 +111,30 @@ export default function VerifyTx({ providerUrl, networkName }) {
         <strong>{networkName || 'none selected (use the top-right wallet menu)'}</strong>
       </p>
 
+      <label className="field-label" htmlFor="tx-hash">
+        Transaction hash
+      </label>
       <input
+        id="tx-hash"
         type="text"
-        placeholder="Transaction Hash (0x...)"
+        className="form-input"
+        placeholder="0x…"
+        spellCheck={false}
         value={txHash}
         onChange={e => setTxHash(e.target.value)}
       />
 
-      <button onClick={verify} disabled={loading}>
-        {loading ? 'Fetching...' : 'Verify Transaction'}
+      <button type="button" className="primary-btn" onClick={verify} disabled={loading}>
+        {loading ? 'Fetching…' : 'Verify Transaction'}
       </button>
 
-      {error && (
-        <pre className="result-box" style={{ color: '#ef4444' }}>
-          {error}
-        </pre>
-      )}
+      {error && <p className="form-error">{error}</p>}
 
       {details && (
-        <div className="function-block">
-          <div style={{ marginBottom: '12px' }}>
-            <strong>Status: </strong>
-            <span style={{ color: statusColor, fontWeight: 600 }}>
-              {details.status}
-            </span>
+        <div className="tx-panel">
+          <div className="tx-status">
+            <span className="wallet-label">Status</span>
+            <span className={`tx-badge ${statusTone}`}>{details.status}</span>
           </div>
           <table className="tx-table">
             <tbody>
