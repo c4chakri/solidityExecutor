@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { describeCalldata, normalizeCalldata, summariseCalldata } from '../lib/calldata';
 import { decodeLogs } from '../lib/events';
 import { describeFailure, extractRevertData } from '../lib/revert';
+import ResultBox from './ResultBox';
 
 /**
  * Sends pre-encoded calldata straight to the contract.
@@ -10,7 +11,7 @@ import { describeFailure, extractRevertData } from '../lib/revert';
  * fallback/receive handler, or calldata produced elsewhere that must go out
  * byte for byte.
  */
-export default function RawCalldata({ contractAddress, abi, signer, hidden }) {
+export default function RawCalldata({ contractAddress, abi, signer, explorerUrl, hidden }) {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState('');
   const [result, setResult] = useState(null);
@@ -94,7 +95,7 @@ export default function RawCalldata({ contractAddress, abi, signer, hidden }) {
             )}
           </div>
 
-          {result && <pre className="result-box">{JSON.stringify(result, null, 2)}</pre>}
+          {result && <ResultBox result={result} explorerUrl={explorerUrl} />}
         </div>
       )}
     </div>

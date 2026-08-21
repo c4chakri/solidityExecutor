@@ -29,8 +29,10 @@ const CALLDATA = new ethers.Interface(ABI).encodeFunctionData('setPolicy', [
   [true, 2],
 ]);
 
-function open(signer) {
-  render(<RawCalldata contractAddress={CONTRACT} abi={ABI} signer={signer} />);
+function open(signer, explorerUrl) {
+  render(
+    <RawCalldata contractAddress={CONTRACT} abi={ABI} signer={signer} explorerUrl={explorerUrl} />
+  );
   fireEvent.click(screen.getByText('Raw calldata'));
   return screen.getByLabelText(/calldata/);
 }
@@ -109,4 +111,19 @@ test('Clear appears only once there is calldata, and empties it', () => {
 
   expect(field).toHaveValue('');
   expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument();
+});
+
+test('the tx hash in a real send links to the configured explorer', async () => {
+  const hash = '0xf4b3334810749b3d1b4b770df8323890fcab7c2b6b8af5a28e231d4161d7fbb6';
+  const sendTransaction = jest.fn().mockResolvedValue({
+    hash,
+    wait: () => Promise.resolve({ blockNumber: 7, gasUsed: 21000n, logs: [] }),
+  });
+
+  const field = open({ sendTransaction }, 'https://sepolia.etherscan.io');
+  fireEvent.change(field, { target: { value: CALLDATA } });
+  fireEvent.click(screen.getByRole('button', { name: 'Send' }));
+
+  const link = await screen.findByRole('link', { name: hash });
+  expect(link).toHaveAttribute('href', `https://sepolia.etherscan.io/tx/${hash}`);
 });

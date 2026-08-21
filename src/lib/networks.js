@@ -156,11 +156,24 @@ export function shortenUrl(url, maxLength = 34) {
   return text.slice(0, maxLength - 1) + '…';
 }
 
+/**
+ * `<explorer>/tx/<hash>` or `<explorer>/address/<addr>`, or null.
+ * A missing `kind` returns null rather than a `/undefined/` path — callers look
+ * it up per field, and most fields are not linkable.
+ */
+export function buildExplorerUrl(base, kind, value) {
+  if (!base || !kind || !value) return null;
+  return `${base.replace(/\/$/, '')}/${kind}/${value}`;
+}
+
+/** The explorer this chain was configured with, if any. */
+export function explorerBase(net) {
+  return net?.blockExplorerUrls?.[0] || null;
+}
+
 /** A tx/address link for a chain, when an explorer is known. */
 export function explorerLink(net, kind, value) {
-  const base = net?.blockExplorerUrls?.[0];
-  if (!base || !value) return null;
-  return `${base.replace(/\/$/, '')}/${kind}/${value}`;
+  return buildExplorerUrl(explorerBase(net), kind, value);
 }
 
 function dedupe(urls) {

@@ -655,6 +655,20 @@ a:focus-visible {
   overflow-y: auto;
 }
 
+/* Explorer links inside the JSON panel and the receipt table. */
+.result-box a,
+.tx-val a {
+  color: var(--accent-2);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent-2) 45%, transparent);
+  text-underline-offset: 2px;
+}
+
+.result-box a:hover,
+.tx-val a:hover {
+  text-decoration-color: var(--accent-2);
+}
+
 .raw-preview {
   margin: 0;
   padding: 0.55rem 0.7rem;

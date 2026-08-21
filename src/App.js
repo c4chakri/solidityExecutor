@@ -4,6 +4,7 @@ import FunctionExecutor from './components/FunctionExecutor';
 import VerifyTx from './components/VerifyTx';
 import WalletConnect from './components/WalletConnect';
 import ThemeToggle from './components/ThemeToggle';
+import { explorerBase } from './lib/networks';
 import { useNetworks } from './lib/useNetworks';
 import { useTheme } from './lib/useTheme';
 
@@ -18,6 +19,7 @@ export default function App() {
   // RPC URL derived from the network + endpoint selected in the navbar wallet
   const providerUrl = rpcUrlFor(chainId);
   const networkName = chainId ? networks[chainId]?.chainName : null;
+  const explorerUrl = chainId ? explorerBase(networks[chainId]) : null;
 
   // Load from localStorage on initial load
   useEffect(() => {
@@ -81,6 +83,7 @@ export default function App() {
               {...contractData}
               providerUrl={providerUrl}
               signer={signer}
+              explorerUrl={explorerUrl}
             />
           )}
 
@@ -96,7 +99,7 @@ export default function App() {
       )}
 
       {view === 'verifyTx' && (
-        <VerifyTx providerUrl={providerUrl} networkName={networkName} />
+        <VerifyTx providerUrl={providerUrl} networkName={networkName} explorerUrl={explorerUrl} />
       )}
     </div>
   );

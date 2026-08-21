@@ -10,6 +10,7 @@ import {
 } from '../lib/abiInput';
 import { describeFailure, extractRevertData } from '../lib/revert';
 import RawCalldata from './RawCalldata';
+import ResultBox from './ResultBox';
 import { decodeLogs } from '../lib/events';
 import { toPlain } from '../lib/abiValues';
 
@@ -20,7 +21,7 @@ const FILTERS = [
   { key: 'write', label: 'Write' },
 ];
 
-export default function FunctionExecutor({ contractAddress, abi, providerUrl, signer }) {
+export default function FunctionExecutor({ contractAddress, abi, providerUrl, signer, explorerUrl }) {
   const [filter, setFilter] = useState('all');
 
   // One provider per RPC URL — recreating it on every render leaks sockets.
@@ -66,6 +67,7 @@ export default function FunctionExecutor({ contractAddress, abi, providerUrl, si
             abi={abi}
             provider={provider}
             signer={signer}
+            explorerUrl={explorerUrl}
           />
         ))}
         {visibleCount === 0 && (
@@ -83,6 +85,7 @@ export default function FunctionExecutor({ contractAddress, abi, providerUrl, si
           contractAddress={contractAddress}
           abi={abi}
           signer={signer}
+          explorerUrl={explorerUrl}
           hidden={filter === 'read'}
         />
       </div>
@@ -90,7 +93,7 @@ export default function FunctionExecutor({ contractAddress, abi, providerUrl, si
   );
 }
 
-function AccordionItem({ fn, hidden, contractAddress, abi, provider, signer }) {
+function AccordionItem({ fn, hidden, contractAddress, abi, provider, signer, explorerUrl }) {
   const [open, setOpen] = useState(false);
   const [inputs, setInputs] = useState({});
   const [result, setResult] = useState(null);
@@ -192,7 +195,7 @@ function AccordionItem({ fn, hidden, contractAddress, abi, provider, signer }) {
             )}
           </div>
 
-          {result && <pre className="result-box">{JSON.stringify(result, null, 2)}</pre>}
+          {result && <ResultBox result={result} explorerUrl={explorerUrl} />}
         </div>
       )}
     </div>

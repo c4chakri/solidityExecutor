@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
+import { buildExplorerUrl } from '../lib/networks';
 
-export default function VerifyTx({ providerUrl, networkName }) {
+export default function VerifyTx({ providerUrl, networkName, explorerUrl }) {
   const [txHash, setTxHash] = useState('');
   const [details, setDetails] = useState(null);
   const [error, setError] = useState(null);
@@ -144,7 +145,13 @@ export default function VerifyTx({ providerUrl, networkName }) {
                 .map(([key, value]) => (
                   <tr key={key}>
                     <td className="tx-key">{labels[key] || key}</td>
-                    <td className="tx-val">{String(value)}</td>
+                    <td className="tx-val">
+                      <ExplorerValue
+                        field={key}
+                        value={String(value)}
+                        explorerUrl={explorerUrl}
+                      />
+                    </td>
                   </tr>
                 ))}
             </tbody>
@@ -152,6 +159,24 @@ export default function VerifyTx({ providerUrl, networkName }) {
         </div>
       )}
     </div>
+  );
+}
+
+/** Which receipt fields the explorer can link, and to what. */
+const EXPLORER_PATHS = {
+  hash: 'tx',
+  from: 'address',
+  to: 'address',
+  contractCreated: 'address',
+};
+
+function ExplorerValue({ field, value, explorerUrl }) {
+  const href = buildExplorerUrl(explorerUrl, EXPLORER_PATHS[field], value);
+  if (!href) return value;
+  return (
+    <a href={href} target="_blank" rel="noreferrer" title="View on block explorer">
+      {value}
+    </a>
   );
 }
 
